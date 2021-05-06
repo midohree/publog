@@ -7,13 +7,14 @@ module.exports = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'midohree', // Usually your GitHub org/user name.
-  projectName: 'publog', // Usually your repo name.
+  organizationName: 'midohree',
+  projectName: 'publog',
   themeConfig: {
     navbar: {
       title: 'midohree.com',
       items: [
         {to: '/', label: 'Blog', position: 'left'},
+        {type: 'search', position: 'right'},
       ],
     },
     prism: {
@@ -39,4 +40,5 @@ module.exports = {
       },
     ],
   ],
+  themes: ['@docusaurus/theme-live-codeblock'],
 };

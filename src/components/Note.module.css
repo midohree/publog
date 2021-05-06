@@ -1,0 +1,22 @@
+.noteContainer {
+  width: 100%;
+  border: 1px solid #aa8bf5;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.noteHeader {
+  color: #aa8bf5;
+  margin-bottom: 10px;
+}
+
+.noteTitle {
+  font-weight: 900;
+  margin-left: 10px;
+}
+
+.noteContents {
+  display: flex;
+  justify-content: center;
+}

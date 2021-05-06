@@ -2,13 +2,13 @@
 module.exports = {
   title: 'midohree',
   tagline: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
-  url: 'https://your-docusaurus-test-site.com',
+  url: 'https://github.com/midohree/publog',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'midohree', // Usually your GitHub org/user name.
+  projectName: 'publog', // Usually your repo name.
   themeConfig: {
     navbar: {
       title: 'midohree.com',
@@ -31,7 +31,7 @@ module.exports = {
           routeBasePath: '/',
           showReadingTime: true,
           editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/blog/',
+            'https://github.com/midohree/publog/tree/master/blog',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

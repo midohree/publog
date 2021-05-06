@@ -3,7 +3,7 @@ module.exports = {
   title: 'midohree',
   tagline: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
   url: 'https://github.com/midohree/publog',
-  baseUrl: '/',
+  baseUrl: '/publog/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',

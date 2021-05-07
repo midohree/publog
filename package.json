@@ -37,5 +37,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^7.25.0",
+    "eslint-plugin-mdx": "^1.13.0",
+    "eslint-plugin-react": "^7.23.2",
+    "remark-preset-prettier": "^0.4.1"
   }
 }

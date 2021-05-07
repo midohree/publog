@@ -5,24 +5,117 @@ author: Dohee Kim
 author_title: Frontend Engineer @ Publ
 author_url: https://github.com/midohree
 author_image_url: https://github.com/midohree.png
-tags: ['AWS', 'Amplify']
+tags: ['AWS', 'Amplify', 'S3']
 ---
 
 import TOCInline from '@theme/TOCInline';
-export const Highlight = ({children, color}) => (
-  <span
-    style={{
-      backgroundColor: color,
-      borderRadius: '2px',
-      color: '#fff',
-      padding: '0.2rem',
-    }}>
-    {children}
-  </span>
-);
+import Columns from '../src/components/Columns';
+import Highlight from '../src/components/Highlight';
+import Note from '../src/components/Note';
+import Line from '../src/components/Line';
 
 <TOCInline toc={toc} />
 
 <!--truncate-->
 
-## 서론
+## AWS amplify로 비디오 업로드하기
+
+AWS Amplify는 모바일 및 프론트엔드 웹 개발자가 AWS에서 구동되는 안전하고 확장 가능한 풀 스택 애플리케이션을 개발하도록
+지원하는 도구 및 서비스입니다. Amplify를 사용하면 몇 분 만에 앱 백엔드를 구성하고 앱을 연결하며, 클릭 몇 번 만으로 정적 웹 앱을 배포하고,
+AWS 콘솔 외부에서 앱 콘텐츠를 쉽게 관리할 수 있습니다.
+
+Publ 셀러 사이드에서 셀러가 비디오를 업로드 할 때 **서버를 따로 두지 않고 브라우저에서 다이렉트로 비디오 파일을 AWS S3로 업로드 하는 기능**을
+맡아 구현했습니다.
+처음 <code>aws-sdk</code>를 이용해 구현하려고 하였으나 `amplify`라는 서비스에 대해 알게 되었고 간단히 cli를 이용해 백엔드 구성까지 할 수 있어
+`aws-sdk`와 `amplify` 중 어떤 것을 사용할지 미리 테스트 한 후 결정하기로 했습니다.
+
+우선 사용해보기 전 각 서비스의 장단점에 대해 나눠봤습니다.
+
+### Aws-sdk
+**장점**
+- 레퍼런스가 많고, Aws 문서화가 잘 되어있다.
+- AWS에서 제공하는 기능들 모두 사용 가능하다.
+
+**단점**
+- API Key와 Secret Key가 노출된다.(`.env`파일에 숨기더라도 build과정에서 노출되게 되어있다.)
+
+### Amplify
+**장점**
+- 백엔드 구성을 간편하게 할 수 있다.
+- 버켓 생성, IAM 유저 생성을 간편하게 cli로 할 수 있다.
+- 백엔드 구성을 해주기 때문에 빌드시 Secret Key, API Key가 노출될 위험이 없다.
+
+**단점**
+- 무겁다.
+- 출시된지 얼마 되지 않아 레퍼런스가 적다.
+- 간편한 기본 기능만 제공하기 때문에 복잡한 앱을 만들시 적합하지 않다.
+
+
+## Amplify 설치 및 설정
+
+<Note>
+  Amplify를 사용하려면 Amazon AWS 계정이 준비되어 있어야 합니다.
+</Note>
+
+**Amplify 설치**
+
+amplify CLI를 전역으로 설치합니다.
+
+```
+npm install -g @aws-amplify/cli
+```
+
+**Amplify CLI congifure**
+
+amplify CLI를 설정합니다.
+
+```
+amplify configure
+```
+
+**AWS 로그인과 IAM 유저 생성**
+
+설정 후 AWS 콘솔에 로그인하라는 메세지와 로그인 링크로 자동으로 들어가게됩니다.
+준비되어 있는 계정으로 로그인을 완료하면 **AWS Region**과 **IAM 유저**를 설정하라는 메세지가 나옵니다.
+Amazon IAM (Identity and Access Management)을 사용하면 AWS에서 사용자와 사용자 권한을 관리 할 수 ​​있습니다.
+
+처음 로그인한 루트계정이 카페 운영자라면 IAM 사용자는 각 게시판을 관리하는 카페지기라고 생각하면 좋을 것 같습니다.
+루트 계정에서 각 IAM 사용자들에게 너는 Storage에 권한이 있고, 너는 Elastic Beanstalk에 권한이 있어~ 라고 각각 개별 권한을 부여해 줄 수 있습니다.
+
+물론 루트계정이 모든 권한을 갖고 있기 때문에 IAM 사용자를 생성하지 않고 루트계정만으로도 할 수 있으나
+
+**Bucket 생성**
+AWS Amplify Storage 모듈은 퍼블릭, 보호 또는 프라이빗 스토리지 버킷에서 앱의 사용자 콘텐츠를 관리하기위한 간단한 메커니즘을 제공합니다.
+스토리지 범주에는 Amazon S3에 대한 기본 지원이 제공됩니다.
+
+Amplify를 사용하여 스토리지를 추가하는 방법에는 수동 및 자동의 두 가지가 있습니다.
+두 방법 모두 authAmazon Cognito 가있는 범주도 활성화해야합니다.
+처음부터 S3 버킷을 생성하는 경우 자동 설정을 사용해야합니다.
+그러나 기존 Cognito 및 S3 리소스를 재사용하는 경우 수동 설정을 선택해야합니다.
+
+저는 버킷 생성부터 시작하기 위해 자동설정을 사용했습니다.
+아래 명령어로 `storage`모듈을 추가합니다.
+
+```
+amplify add storage
+```
+
+프롬프트 옵션에서
+
+
+**IAM 유저 설정**
+
+**Bucket 설정**
+
+## Dropzone.js
+
+## 사용 후 느낀점
+
+
+`aws-sdk`는 이미 다수의 레퍼런스를 보유하고 있고, 커뮤니티도 잘 형성되어 있습니다. AWS에서 제공하는 대부분의 기능들을 사용할 수 있기 때문에
+복잡한 기능을 수행해야하는 앱이라면 `aws-sdk`가 더 적합합니다. 하지만 빌드 과정에서 API Key와 Secret Key가 노출된다는 단점이 있어
+보안의 위험성이 있습니다. 사실상 `.env` 파일 내부는 모두 노출되게 되어있기 때문에 서버 없이는 클라이언트단에서 중요한 정보를 100% 숨기는건
+불가능합니다.
+
+필요한 기능(현재는 Storage)만 추가하고 싶은데 Amplify를 이용하려면 무조건적으로 `Auth` 기능 또한 추가해야 합니다.
+
